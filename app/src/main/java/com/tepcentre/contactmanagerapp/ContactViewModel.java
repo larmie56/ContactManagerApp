@@ -23,4 +23,8 @@ public class ContactViewModel extends ViewModel {
     public void deleteContact(long contactId) {
         mContactRepo.deleteContact(contactId);
     }
+
+    public void getAllContacts() {
+        mContactRepo.getAllContacts();
+    }
 }
