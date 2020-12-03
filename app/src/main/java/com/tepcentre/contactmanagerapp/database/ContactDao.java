@@ -2,6 +2,7 @@ package com.tepcentre.contactmanagerapp.database;
 
 import androidx.room.Dao;
 import androidx.room.Insert;
+import androidx.room.Query;
 import androidx.room.Update;
 
 @Dao
@@ -12,4 +13,7 @@ public interface ContactDao {
     
     @Update
     void updateContact(Contact contact);
+
+    @Query("DELETE FROM contact_table WHERE contactId =:contactId")
+    void deleteContact(long contactId);
 }

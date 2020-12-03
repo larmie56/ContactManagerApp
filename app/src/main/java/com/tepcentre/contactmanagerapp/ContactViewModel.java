@@ -19,4 +19,8 @@ public class ContactViewModel extends ViewModel {
     public void updateContact(Contact contact) {
         mContactRepo.updateContact(contact);
     }
+
+    public void deleteContact(long contactId) {
+        mContactRepo.deleteContact(contactId);
+    }
 }

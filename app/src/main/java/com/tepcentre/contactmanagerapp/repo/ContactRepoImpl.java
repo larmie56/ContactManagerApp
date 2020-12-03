@@ -20,4 +20,9 @@ public class ContactRepoImpl implements ContactRepo{
     public void updateContact(Contact contact) {
         mContactDao.updateContact(contact);
     }
+
+    @Override
+    public void deleteContact(long contactId) {
+        mContactDao.deleteContact(contactId);
+    }
 }
