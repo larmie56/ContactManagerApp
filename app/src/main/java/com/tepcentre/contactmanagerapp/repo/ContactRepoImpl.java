@@ -15,4 +15,9 @@ public class ContactRepoImpl implements ContactRepo{
     public void createContact(Contact contact) {
         mContactDao.insertContact(contact);
     }
+
+    @Override
+    public void updateContact(Contact contact) {
+        mContactDao.updateContact(contact);
+    }
 }

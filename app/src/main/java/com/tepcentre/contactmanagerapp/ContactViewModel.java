@@ -6,7 +6,7 @@ import com.tepcentre.contactmanagerapp.database.Contact;
 import com.tepcentre.contactmanagerapp.repo.ContactRepo;
 
 public class ContactViewModel extends ViewModel {
-    private ContactRepo mContactRepo;
+    private final ContactRepo mContactRepo;
 
     public ContactViewModel(ContactRepo contactRepo) {
         mContactRepo = contactRepo;
@@ -14,5 +14,9 @@ public class ContactViewModel extends ViewModel {
 
     public void insertContact(Contact contact) {
         mContactRepo.createContact(contact);
+    }
+
+    public void updateContact(Contact contact) {
+        mContactRepo.updateContact(contact);
     }
 }
