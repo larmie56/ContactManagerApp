@@ -27,4 +27,8 @@ public class ContactViewModel extends ViewModel {
     public void getAllContacts() {
         mContactRepo.getAllContacts();
     }
+
+    public void getContact(long contactId) {
+        mContactRepo.getContact(contactId);
+    }
 }
