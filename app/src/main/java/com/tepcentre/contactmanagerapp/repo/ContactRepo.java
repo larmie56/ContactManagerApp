@@ -4,11 +4,13 @@ import androidx.lifecycle.LiveData;
 
 import com.tepcentre.contactmanagerapp.database.Contact;
 
+import java.util.List;
+
 public interface ContactRepo {
 
     void createContact(Contact contact);
     void updateContact(Contact contact);
     void deleteContact(long contactId);
-    void getAllContacts();
+    LiveData<List<Contact>> getAllContacts();
     LiveData<Contact> getContact(long contactId);
 }

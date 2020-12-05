@@ -5,6 +5,8 @@ import androidx.lifecycle.LiveData;
 import com.tepcentre.contactmanagerapp.database.Contact;
 import com.tepcentre.contactmanagerapp.database.ContactDao;
 
+import java.util.List;
+
 public class ContactRepoImpl implements ContactRepo{
 
     private ContactDao mContactDao;
@@ -29,8 +31,8 @@ public class ContactRepoImpl implements ContactRepo{
     }
 
     @Override
-    public void getAllContacts() {
-        mContactDao.getAllContacts();
+    public LiveData<List<Contact>> getAllContacts() {
+        return mContactDao.getAllContacts();
     }
 
     @Override

@@ -49,4 +49,7 @@ dependencies {
     //room
     implementation "androidx.room:room-runtime:$room_version"
     annotationProcessor "androidx.room:room-compiler:$room_version"
+
+    //TextDrawable
+    implementation 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
 }

@@ -1,12 +1,20 @@
-package com.tepcentre.contactmanagerapp;
+package com.tepcentre.contactmanagerapp.ui;
 
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.tepcentre.contactmanagerapp.database.Contact;
 import com.tepcentre.contactmanagerapp.repo.ContactRepo;
 
+import java.util.List;
+
 public class ContactViewModel extends ViewModel {
     private final ContactRepo mContactRepo;
+
+    private LiveData<List<Contact>> mContactListLiveData;
+
+    private LiveData<Contact> mContactLiveData;
 
     public ContactViewModel(ContactRepo contactRepo) {
         mContactRepo = contactRepo;
@@ -25,10 +33,18 @@ public class ContactViewModel extends ViewModel {
     }
 
     public void getAllContacts() {
-        mContactRepo.getAllContacts();
+        mContactListLiveData = mContactRepo.getAllContacts();
     }
 
     public void getContact(long contactId) {
-        mContactRepo.getContact(contactId);
+        mContactLiveData = mContactRepo.getContact(contactId);
+    }
+
+    public LiveData<List<Contact>> getContactListLiveData() {
+        return mContactListLiveData;
+    }
+
+    public LiveData<Contact> getContactLiveData() {
+        return mContactLiveData;
     }
 }
