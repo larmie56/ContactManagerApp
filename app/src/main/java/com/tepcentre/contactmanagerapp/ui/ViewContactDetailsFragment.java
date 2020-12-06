@@ -1,4 +1,4 @@
 package com.tepcentre.contactmanagerapp.ui;
 
-public class ContactDetailsFragment {
+public class ViewContactDetailsFragment {
 }

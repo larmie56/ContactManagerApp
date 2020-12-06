@@ -4,4 +4,7 @@
     <string name="birthday">Birthday</string>
     <string name="address">Address</string>
     <string name="zip_code">Zip Code</string>
+    <string name="first_name">First Name</string>
+    <string name="last_name">Last Name</string>
+    <string name="save_changes">SAVE CHANGES</string>
 </resources>
