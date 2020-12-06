@@ -1,4 +1,6 @@
 package com.tepcentre.contactmanagerapp.ui;
 
-public class AllContactsFragment {
+import androidx.fragment.app.Fragment;
+
+public class AllContactsFragment extends Fragment {
 }

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" android:id="@+id/nav_graph"
+    app:startDestination="@id/allContactsFragment">
+
+    <fragment
+        android:id="@+id/allContactsFragment"
+        android:name="com.tepcentre.contactmanagerapp.ui.AllContactsFragment"
+        android:label="AllContactsFragment" >
+        <action
+            android:id="@+id/action_allContactsFragment_to_viewContactDetailsFragment"
+            app:destination="@id/viewContactDetailsFragment" />
+        <action
+            android:id="@+id/action_allContactsFragment_to_editContactDetailsFragment"
+            app:destination="@id/editContactDetailsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/viewContactDetailsFragment"
+        android:name="com.tepcentre.contactmanagerapp.ui.ViewContactDetailsFragment"
+        android:label="ViewContactDetailsFragment" >
+        <action
+            android:id="@+id/action_viewContactDetailsFragment_to_editContactDetailsFragment"
+            app:destination="@id/editContactDetailsFragment" />
+        <action
+            android:id="@+id/action_viewContactDetailsFragment_to_allContactsFragment"
+            app:destination="@id/allContactsFragment"
+            app:launchSingleTop="true"
+            app:popUpTo="@id/allContactsFragment"
+            app:popUpToInclusive="true" />
+        <argument
+            android:name="contact_id"
+            app:argType="long" />
+    </fragment>
+    <fragment
+        android:id="@+id/editContactDetailsFragment"
+        android:name="com.tepcentre.contactmanagerapp.ui.EditContactDetailsFragment"
+        android:label="EditContactDetailsFragment" >
+        <action
+            android:id="@+id/action_editContactDetailsFragment_to_allContactsFragment"
+            app:destination="@id/allContactsFragment"
+            app:launchSingleTop="true"
+            app:popUpTo="@id/allContactsFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_editContactDetailsFragment_to_viewContactDetailsFragment"
+            app:destination="@id/viewContactDetailsFragment"
+            app:launchSingleTop="true"
+            app:popUpTo="@id/allContactsFragment"
+            app:popUpToInclusive="true" />
+        <argument
+            android:name="contact_id"
+            app:argType="long"
+            android:defaultValue="-1L" />
+    </fragment>
+</navigation>

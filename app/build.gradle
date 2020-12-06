@@ -1,5 +1,6 @@
 plugins {
     id 'com.android.application'
+    id 'androidx.navigation.safeargs'
 }
 
 android {
@@ -41,6 +42,7 @@ dependencies {
     def lifecycle_version = "2.2.0"
     def arch_version = "2.1.0"
     def room_version = "2.2.5"
+    def nav_version = "2.3.2"
 
     // ViewModel
     implementation "androidx.lifecycle:lifecycle-viewmodel:$lifecycle_version"
@@ -52,4 +54,8 @@ dependencies {
 
     //TextDrawable
     implementation 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
+
+    //Navigation
+    implementation "androidx.navigation:navigation-fragment:$nav_version"
+    implementation "androidx.navigation:navigation-ui:$nav_version"
 }

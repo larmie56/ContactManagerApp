@@ -1,4 +1,6 @@
 package com.tepcentre.contactmanagerapp.ui;
 
-public class ViewContactDetailsFragment {
+import androidx.fragment.app.Fragment;
+
+public class ViewContactDetailsFragment extends Fragment {
 }
