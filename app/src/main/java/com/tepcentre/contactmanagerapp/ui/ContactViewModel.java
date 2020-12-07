@@ -1,23 +1,35 @@
 package com.tepcentre.contactmanagerapp.ui;
 
+import android.app.Application;
+
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.tepcentre.contactmanagerapp.database.Contact;
+import com.tepcentre.contactmanagerapp.database.ContactDao;
+import com.tepcentre.contactmanagerapp.database.ContactDatabase;
 import com.tepcentre.contactmanagerapp.repo.ContactRepo;
+import com.tepcentre.contactmanagerapp.repo.ContactRepoImpl;
 
 import java.util.List;
 
-public class ContactViewModel extends ViewModel {
+public class ContactViewModel extends AndroidViewModel {
     private final ContactRepo mContactRepo;
 
     private LiveData<List<Contact>> mContactListLiveData;
 
     private LiveData<Contact> mContactLiveData;
 
-    public ContactViewModel(ContactRepo contactRepo) {
-        mContactRepo = contactRepo;
+    public ContactViewModel(@NonNull Application application) {
+        super(application);
+
+        ContactDatabase contactDatabase = ContactDatabase.getDatabase(application);
+        ContactDao contactDao = contactDatabase.getContactDao();
+
+        mContactRepo = new ContactRepoImpl(contactDao); //Fix this
     }
 
     public void insertContact(Contact contact) {
