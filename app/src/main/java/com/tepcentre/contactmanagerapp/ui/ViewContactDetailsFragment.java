@@ -12,6 +12,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import com.tepcentre.contactmanagerapp.R;
 import com.tepcentre.contactmanagerapp.database.Contact;
@@ -42,8 +44,6 @@ public class ViewContactDetailsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        contactId = ViewContactDetailsFragmentArgs.fromBundle(requireArguments()).getContactId();
-
         mTextDrawable = view.findViewById(R.id.image_text_drawable);
         mContactName = view.findViewById(R.id.text_contact_name);
         mEditContactImage = view.findViewById(R.id.image_edit_contact);
@@ -52,6 +52,8 @@ public class ViewContactDetailsFragment extends Fragment {
         mBirthdayText = view.findViewById(R.id.text_birthday);
         mAddressText = view.findViewById(R.id.text_address);
         mZipCodeText = view.findViewById(R.id.text_zip_code);
+
+        contactId = ViewContactDetailsFragmentArgs.fromBundle(requireArguments()).getContactId();
 
         ContactViewModel contactViewModel = new ViewModelProvider(getActivity()).get(ContactViewModel.class);
         contactViewModel.getContact(contactId);
@@ -75,7 +77,11 @@ public class ViewContactDetailsFragment extends Fragment {
             mEditContactImage.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-
+                    ViewContactDetailsFragmentDirections.ActionViewContactDetailsFragmentToEditContactDetailsFragment fragmentDirections
+                            = ViewContactDetailsFragmentDirections.actionViewContactDetailsFragmentToEditContactDetailsFragment();
+                    fragmentDirections.setContactId(mContact.getContactId());
+                    NavController navController = Navigation.findNavController(view);
+                    navController.navigate(fragmentDirections);
                 }
             });
             //Confirm if the user wants to delete the contact, and take appropriate action

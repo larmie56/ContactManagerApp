@@ -12,13 +12,12 @@ import java.util.List;
 
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
-import io.reactivex.rxjava3.internal.schedulers.RxThreadFactory;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class ContactRepoImpl implements ContactRepo{
 
     private final ContactDao mContactDao;
-    private Disposable mCreateDiposable;
+    private final CompositeDisposable mDisposable = new CompositeDisposable();
 
     public ContactRepoImpl(Application application) {
         ContactDatabase contactDatabase = ContactDatabase.getDatabase(application);
@@ -27,18 +26,23 @@ public class ContactRepoImpl implements ContactRepo{
 
     @Override
     public void createContact(Contact contact) {
-        mCreateDiposable = Schedulers.io().scheduleDirect(new Runnable() {
+        mDisposable.add(Schedulers.io().scheduleDirect(new Runnable() {
             @Override
             public void run() {
                 mContactDao.insertContact(contact);
             }
-        });
+        }));
 
     }
 
     @Override
     public void updateContact(Contact contact) {
-        mContactDao.updateContact(contact);
+        mDisposable.add(Schedulers.io().scheduleDirect(new Runnable() {
+            @Override
+            public void run() {
+                mContactDao.updateContact(contact);
+            }
+        }));
     }
 
     @Override
@@ -58,8 +62,8 @@ public class ContactRepoImpl implements ContactRepo{
 
     @Override
     public void cleanup() {
-        if (!(mCreateDiposable == null && mCreateDiposable.isDisposed())) {
-            mCreateDiposable.dispose();
+        if (!(mDisposable == null && mDisposable.isDisposed())) {
+            mDisposable.dispose();
         }
     }
 }

@@ -5,12 +5,8 @@ import android.app.Application;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
 import com.tepcentre.contactmanagerapp.database.Contact;
-import com.tepcentre.contactmanagerapp.database.ContactDao;
-import com.tepcentre.contactmanagerapp.database.ContactDatabase;
 import com.tepcentre.contactmanagerapp.repo.ContactRepo;
 import com.tepcentre.contactmanagerapp.repo.ContactRepoImpl;
 
