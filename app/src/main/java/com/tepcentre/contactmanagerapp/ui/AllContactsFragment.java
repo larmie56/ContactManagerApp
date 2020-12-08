@@ -40,6 +40,7 @@ public class AllContactsFragment extends Fragment {
         mRecyclerView = view.findViewById(R.id.recycler_contacts);
         mFloatingActionButton = view.findViewById(R.id.fab_create_contact);
 
+        //Navigate to the edit contact screen for the user to create a new account
         mFloatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

@@ -8,9 +8,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.tepcentre.contactmanagerapp.database.Contact;
+import com.tepcentre.contactmanagerapp.ui.AllContactsFragmentDirections;
 import com.tepcentre.contactmanagerapp.util.Util;
 
 import java.util.List;
@@ -65,11 +68,14 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
             Contact contact = contacts.get(position);
             Util util = new Util(contact);
 
-            //On click of a contact, the contact details should be opened
+            //Navigate to the edit contact screen for the user to edit the contact, passing in the contact id
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-
+                    NavController navController = Navigation.findNavController(view);
+                    navController.navigate(
+                            AllContactsFragmentDirections.
+                                    actionAllContactsFragmentToViewContactDetailsFragment(contact.getContactId()));
                 }
             });
             //Set the text drawable to the first letter contact's first and last names
