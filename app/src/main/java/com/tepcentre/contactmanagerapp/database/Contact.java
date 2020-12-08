@@ -8,7 +8,23 @@ import androidx.room.PrimaryKey;
 @Entity(tableName = "contact_table", indices = {@Index(value = "phone_number", unique = true)})
 public class Contact {
 
-    @PrimaryKey
+    public Contact() {}
+
+    public Contact(String firstName,
+                   String lastName,
+                   long phoneNumber,
+                   String birthday,
+                   String address,
+                   int zipCode) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.phoneNumber = phoneNumber;
+        this.birthday = birthday;
+        this.address = address;
+        this.zipCode = zipCode;
+    }
+
+    @PrimaryKey(autoGenerate = true)
     private long contactId;
     @ColumnInfo(name = "first_name")
     private String firstName;

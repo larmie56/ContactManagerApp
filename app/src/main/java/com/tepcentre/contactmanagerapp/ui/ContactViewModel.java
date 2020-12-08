@@ -20,16 +20,12 @@ public class ContactViewModel extends AndroidViewModel {
     private final ContactRepo mContactRepo;
 
     private LiveData<List<Contact>> mContactListLiveData;
-
     private LiveData<Contact> mContactLiveData;
 
     public ContactViewModel(@NonNull Application application) {
         super(application);
 
-        ContactDatabase contactDatabase = ContactDatabase.getDatabase(application);
-        ContactDao contactDao = contactDatabase.getContactDao();
-
-        mContactRepo = new ContactRepoImpl(contactDao); //Fix this
+        mContactRepo = new ContactRepoImpl(application);
     }
 
     public void insertContact(Contact contact) {

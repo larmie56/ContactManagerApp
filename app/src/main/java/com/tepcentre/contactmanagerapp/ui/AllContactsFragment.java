@@ -10,6 +10,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -38,9 +40,17 @@ public class AllContactsFragment extends Fragment {
         mRecyclerView = view.findViewById(R.id.recycler_contacts);
         mFloatingActionButton = view.findViewById(R.id.fab_create_contact);
 
+        mFloatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                NavController navController = Navigation.findNavController(view);
+                navController.navigate(AllContactsFragmentDirections.actionAllContactsFragmentToEditContactDetailsFragment());
+            }
+        });
+
         ContactAdapter contactAdapter = new ContactAdapter(getContext());
 
-        ContactViewModel contactViewModel = new ViewModelProvider(this).get(ContactViewModel.class);
+        ContactViewModel contactViewModel = new ViewModelProvider(getActivity()).get(ContactViewModel.class);
         contactViewModel.getAllContacts();
 
         contactViewModel.getContactListLiveData().observe(getViewLifecycleOwner(), new Observer<List<Contact>>() {

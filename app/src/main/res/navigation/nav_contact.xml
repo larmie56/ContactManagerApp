@@ -40,13 +40,13 @@
             app:destination="@id/allContactsFragment"
             app:launchSingleTop="true"
             app:popUpTo="@id/allContactsFragment"
-            app:popUpToInclusive="true" />
+            app:popUpToInclusive="false" />
         <action
             android:id="@+id/action_editContactDetailsFragment_to_viewContactDetailsFragment"
             app:destination="@id/viewContactDetailsFragment"
             app:launchSingleTop="true"
             app:popUpTo="@id/allContactsFragment"
-            app:popUpToInclusive="true" />
+            app:popUpToInclusive="false" />
         <argument
             android:name="contact_id"
             app:argType="long"

@@ -13,4 +13,5 @@ public interface ContactRepo {
     void deleteContact(long contactId);
     LiveData<List<Contact>> getAllContacts();
     LiveData<Contact> getContact(long contactId);
+    void cleanup();
 }

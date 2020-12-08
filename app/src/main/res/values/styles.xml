@@ -13,12 +13,4 @@
         <item name="android:layout_marginStart">12dp</item>
         <item name="android:layout_marginTop">10dp</item>
     </style>
-
-    <style name="Button.Lime" parent="ThemeOverlay.AppCompat">
-        <item name="colorAccent">@color/lime_A400</item>
-    </style>
-
-    <style name="ButtonStyle" parent="android:style/Widget.Button">
-        <item name="android:background">@color/lime_A400</item>
-    </style>
 </resources>

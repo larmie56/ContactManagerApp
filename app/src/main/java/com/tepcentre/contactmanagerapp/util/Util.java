@@ -34,7 +34,7 @@ public class Util {
         if (!(mContact.getFirstName().isEmpty() && mContact.getLastName().isEmpty())) {
             return String.valueOf(mContact.getFirstName().charAt(0)) + mContact.getLastName().charAt(0);
         }
-        throw new IllegalArgumentException("Wrong Argument");
+        throw new IllegalArgumentException("Contact names cannot be empty");
     }
 
     public String formatContactName() {
