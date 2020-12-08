@@ -51,4 +51,11 @@ public class ContactViewModel extends AndroidViewModel {
     public LiveData<Contact> getContactLiveData() {
         return mContactLiveData;
     }
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+
+        mContactRepo.cleanup();
+    }
 }

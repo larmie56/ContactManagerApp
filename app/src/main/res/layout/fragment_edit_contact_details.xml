@@ -87,7 +87,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/text_birthday"
         app:layout_constraintTop_toTopOf="@id/text_birthday"
-        app:tint="@color/lime_A400"
+        app:tint="@color/lime_dark"
         android:contentDescription="@string/birthday" />
 
     <com.google.android.material.textfield.TextInputLayout

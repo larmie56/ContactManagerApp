@@ -47,7 +47,12 @@ public class ContactRepoImpl implements ContactRepo{
 
     @Override
     public void deleteContact(long contactId) {
-        mContactDao.deleteContact(contactId);
+        mDisposable.add(Schedulers.io().scheduleDirect(new Runnable() {
+            @Override
+            public void run() {
+                mContactDao.deleteContact(contactId);
+            }
+        }));
     }
 
     @Override

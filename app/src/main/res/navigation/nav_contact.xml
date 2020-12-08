@@ -25,8 +25,7 @@
             android:id="@+id/action_viewContactDetailsFragment_to_allContactsFragment"
             app:destination="@id/allContactsFragment"
             app:launchSingleTop="true"
-            app:popUpTo="@id/allContactsFragment"
-            app:popUpToInclusive="true" />
+            app:popUpTo="@id/allContactsFragment" />
         <argument
             android:name="contact_id"
             app:argType="long" />

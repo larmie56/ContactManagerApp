@@ -1,11 +1,14 @@
 package com.tepcentre.contactmanagerapp.ui;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -14,6 +17,8 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
+import androidx.navigation.ui.NavigationUI;
 
 import com.tepcentre.contactmanagerapp.R;
 import com.tepcentre.contactmanagerapp.database.Contact;
@@ -21,7 +26,7 @@ import com.tepcentre.contactmanagerapp.util.Util;
 
 public class ViewContactDetailsFragment extends Fragment {
 
-    private long contactId;
+    private long mContactId;
 
     private ImageView mTextDrawable;
     private TextView mContactName;
@@ -33,6 +38,7 @@ public class ViewContactDetailsFragment extends Fragment {
     private TextView mZipCodeText;
 
     private Contact mContact;
+    private ContactViewModel mContactViewModel;
 
     @Nullable
     @Override
@@ -53,12 +59,12 @@ public class ViewContactDetailsFragment extends Fragment {
         mAddressText = view.findViewById(R.id.text_address);
         mZipCodeText = view.findViewById(R.id.text_zip_code);
 
-        contactId = ViewContactDetailsFragmentArgs.fromBundle(requireArguments()).getContactId();
+        mContactId = ViewContactDetailsFragmentArgs.fromBundle(requireArguments()).getContactId();
 
-        ContactViewModel contactViewModel = new ViewModelProvider(getActivity()).get(ContactViewModel.class);
-        contactViewModel.getContact(contactId);
+        mContactViewModel = new ViewModelProvider(getActivity()).get(ContactViewModel.class);
+        mContactViewModel.getContact(mContactId);
 
-        contactViewModel.getContactLiveData().observe(getViewLifecycleOwner(), new Observer<Contact>() {
+        mContactViewModel.getContactLiveData().observe(getViewLifecycleOwner(), new Observer<Contact>() {
             @Override
             public void onChanged(Contact contact) {
                 mContact = contact;
@@ -73,8 +79,8 @@ public class ViewContactDetailsFragment extends Fragment {
             Util util = new Util(mContact);
             util.displayTextDrawable(mTextDrawable);
             mContactName.setText(util.formatContactName());
-            //Navigate to the edit contact screen so the user can edit the contact
             mEditContactImage.setOnClickListener(new View.OnClickListener() {
+                //Navigate to the edit contact screen so the user can edit the contact, passing in the contact id
                 @Override
                 public void onClick(View view) {
                     ViewContactDetailsFragmentDirections.ActionViewContactDetailsFragmentToEditContactDetailsFragment fragmentDirections
@@ -88,7 +94,7 @@ public class ViewContactDetailsFragment extends Fragment {
             mDeleteContactImage.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-
+                    handleConfirmationDialog();
                 }
             });
             mPhoneNumberText.setText(String.valueOf(mContact.getPhoneNumber()));
@@ -96,5 +102,28 @@ public class ViewContactDetailsFragment extends Fragment {
             mAddressText.setText(mContact.getAddress());
             mZipCodeText.setText(String.valueOf(mContact.getZipCode()));
         }
+    }
+
+    private void handleConfirmationDialog() {
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getContext());
+        dialogBuilder.setTitle(R.string.delete_contact);
+        dialogBuilder.setMessage(R.string.confirm_delete);
+        dialogBuilder.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                mContactViewModel.deleteContact(mContactId);
+                dialogInterface.dismiss();
+                Toast.makeText(getContext(), R.string.contact_deleted, Toast.LENGTH_SHORT).show();
+                NavController navController = NavHostFragment.findNavController(ViewContactDetailsFragment.this);
+                navController.navigate(ViewContactDetailsFragmentDirections.actionViewContactDetailsFragmentToAllContactsFragment());
+            }
+        });
+        dialogBuilder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+        dialogBuilder.create().show();
     }
 }

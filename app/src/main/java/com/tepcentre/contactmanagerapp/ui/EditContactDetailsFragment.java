@@ -80,34 +80,35 @@ public class EditContactDetailsFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 getUserInput();
-                if (isNewContact) {
-                    mContact = new Contact(mFirstName,
-                            mLastName,
-                            Long.parseLong(mPhoneNumber),
-                            mBirthday,
-                            mAddress,
-                            Integer.parseInt(mZipCode)
-                    );
-                    contactViewModel.insertContact(mContact);
-                    Toast.makeText(getContext(), "Contact Added Successfully", Toast.LENGTH_SHORT).show();
-                } else {
-                    mContact.setFirstName(mFirstName);
-                    mContact.setLastName(mLastName);
-                    mContact.setPhoneNumber(Long.parseLong(mPhoneNumber));
-                    mContact.setBirthday(mBirthday);
-                    mContact.setAddress(mAddress);
-                    mContact.setZipCode(Integer.parseInt(mZipCode));
-                    contactViewModel.updateContact(mContact);
-                    Toast.makeText(getContext(), "Contact Updated Successfully", Toast.LENGTH_SHORT).show();
+                if (!(mFirstName.isEmpty() && mLastName.isEmpty() && mPhoneNumber.isEmpty() && mZipCode.isEmpty())) {
+                    if (isNewContact) {
+                        mContact = new Contact(mFirstName,
+                                mLastName,
+                                Long.parseLong(mPhoneNumber),
+                                mBirthday,
+                                mAddress,
+                                Integer.parseInt(mZipCode)
+                        );
+                        if (mContact != null) contactViewModel.insertContact(mContact);
+                        Toast.makeText(getContext(), "Contact Added Successfully", Toast.LENGTH_SHORT).show();
+                    } else {
+                        mContact.setFirstName(mFirstName);
+                        mContact.setLastName(mLastName);
+                        mContact.setPhoneNumber(Long.parseLong(mPhoneNumber));
+                        mContact.setBirthday(mBirthday);
+                        mContact.setAddress(mAddress);
+                        mContact.setZipCode(Integer.parseInt(mZipCode));
+                        if (mContact != null) contactViewModel.updateContact(mContact);
+                        Toast.makeText(getContext(), "Contact Updated Successfully", Toast.LENGTH_SHORT).show();
+                    }
+                    //Update/Insert completed, navigate back to the all contacts screen
+                    NavController navController = Navigation.findNavController(view);
+                    navController
+                            .navigate(EditContactDetailsFragmentDirections
+                                    .actionEditContactDetailsFragmentToAllContactsFragment());
                 }
-                //Update/Insert completed, navigate back to the all contacts screen
-                NavController navController = Navigation.findNavController(view);
-                navController
-                        .navigate(EditContactDetailsFragmentDirections
-                                .actionEditContactDetailsFragmentToAllContactsFragment());
             }
         });
-
     }
 
     private void updateUi() {

@@ -8,8 +8,8 @@
 
     <ImageView
         android:id="@+id/image_text_drawable"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:layout_marginStart="16dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -35,11 +35,11 @@
         android:layout_height="wrap_content"
         android:src="@drawable/ic_phone"
         android:layout_marginEnd="8dp"
-        android:padding="8dp"
+        android:padding="4dp"
         app:layout_constraintEnd_toStartOf="@id/image_text"
         app:layout_constraintTop_toTopOf="@id/text_contact_name"
         app:layout_constraintBottom_toBottomOf="@id/text_contact_name"
-        app:tint="@color/lime_A400" />
+        app:tint="@color/lime_dark" />
 
     <ImageView
         android:id="@+id/image_text"
@@ -47,7 +47,7 @@
         android:layout_height="wrap_content"
         android:src="@drawable/ic_text"
         android:layout_marginEnd="16dp"
-        android:padding="8dp"
+        android:padding="4dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/text_contact_name"
         app:layout_constraintBottom_toBottomOf="@id/text_contact_name"
