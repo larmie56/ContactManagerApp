@@ -22,9 +22,22 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
 
     private final LayoutInflater mInflater;
     private List<Contact> mContacts;
+    private IAllContactsFragment mIAllContactsFragment;
 
-    public ContactAdapter(Context context) {
+
+    /**
+     * This interface will be used to communicate between this adapter class and AllContactsFragment
+     * AllContactsFragment must implement this interface and provide the implementation for the methods declared here
+     */
+    public interface IAllContactsFragment {
+        void handleCallIntent(Contact contact);
+        void handleMessageIntent(Contact contact);
+    }
+
+
+    public ContactAdapter(Context context, IAllContactsFragment iAllContactsFragment) {
         mInflater = LayoutInflater.from(context);
+        mIAllContactsFragment = iAllContactsFragment;
     }
 
     @NonNull
@@ -36,7 +49,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
 
     @Override
     public void onBindViewHolder(@NonNull ContactViewHolder holder, int position) {
-        holder.bind(mContacts, position);
+        holder.bind(mIAllContactsFragment, mContacts, position);
     }
 
     @Override
@@ -64,7 +77,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
             mTextImage = itemView.findViewById(R.id.image_text);
         }
 
-        public void bind(List<Contact> contacts, int position) {
+        public void bind(IAllContactsFragment iAllContactsFragment, List<Contact> contacts, int position) {
             Contact contact = contacts.get(position);
             Util util = new Util(contact);
 
@@ -84,13 +97,13 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
             mPhoneImage.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-
+                    iAllContactsFragment.handleCallIntent(contact);
                 }
             });
             mTextImage.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-
+                    iAllContactsFragment.handleMessageIntent(contact);
                 }
             });
         }
