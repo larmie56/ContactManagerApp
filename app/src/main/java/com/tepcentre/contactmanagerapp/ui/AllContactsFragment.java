@@ -1,6 +1,9 @@
 package com.tepcentre.contactmanagerapp.ui;
 
+import android.animation.Animator;
+import android.animation.AnimatorInflater;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,6 +60,9 @@ public class AllContactsFragment extends Fragment {
         contactViewModel.getContactListLiveData().observe(getViewLifecycleOwner(), new Observer<List<Contact>>() {
             @Override
             public void onChanged(List<Contact> contacts) {
+                //If there's no data in the database, animate the floatingActionButton(fab) ~
+                // to serve as a notifier to the user, to click on the fab to create a new contact
+                if (contacts.isEmpty()) animateFab();
                 contactAdapter.setData(contacts);
             }
         });
@@ -65,4 +71,30 @@ public class AllContactsFragment extends Fragment {
         mRecyclerView.setAdapter(contactAdapter);
         mRecyclerView.setLayoutManager(layoutManager);
     }
+
+    private void animateFab() {
+        Handler animationHandler = new Handler(getActivity().getMainLooper());
+        //Delay the animation for about 1 secs
+        animationHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                displayFabAnimation();
+            }
+        }, 1000);
+        //Run the animation for a second time, this time after about 3 secs
+        animationHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                displayFabAnimation();
+            }
+        }, 3000);
+    }
+
+    private void displayFabAnimation() {
+        Animator fabAnimation = AnimatorInflater.loadAnimator(getContext(), R.animator.fab_animation);
+        fabAnimation.setTarget(mFloatingActionButton);
+        fabAnimation.start();
+        //fabAnimation.addListener(this);
+    }
+
 }
