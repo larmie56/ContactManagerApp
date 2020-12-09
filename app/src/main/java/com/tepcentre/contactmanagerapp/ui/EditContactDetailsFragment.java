@@ -1,11 +1,14 @@
 package com.tepcentre.contactmanagerapp.ui;
 
+import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.DatePicker;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -20,10 +23,13 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.tepcentre.contactmanagerapp.R;
 import com.tepcentre.contactmanagerapp.database.Contact;
 
+import java.util.Calendar;
+
 public class EditContactDetailsFragment extends Fragment {
 
     public static final long NEW_CONTACT_ID = -1L;
     private long mContactId;
+    private TextView mBirthdayText;
     private TextInputEditText mFirstNameEdit;
     private TextInputEditText mLastNameEdit;
     private TextInputEditText mPhoneNumberEdit;
@@ -54,6 +60,7 @@ public class EditContactDetailsFragment extends Fragment {
         mFirstNameEdit = view.findViewById(R.id.edit_first_name);
         mLastNameEdit = view.findViewById(R.id.edit_last_name);
         mPhoneNumberEdit = view.findViewById(R.id.edit_phone_number);
+        mBirthdayText = view.findViewById(R.id.text_birthday);
         mBirthdayImage = view.findViewById(R.id.image_birthday);
         mAddressEdit = view.findViewById(R.id.edit_address);
         mZipCodeEdit = view.findViewById(R.id.edit_zip_code);
@@ -109,6 +116,28 @@ public class EditContactDetailsFragment extends Fragment {
                 }
             }
         });
+
+        mBirthdayImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Calendar calendar = Calendar.getInstance();
+                final Integer year = calendar.get(Calendar.YEAR);
+                int month = calendar.get(Calendar.MONTH);
+                int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+                DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
+                        int  year = i2;
+                        int month = i1 + 1;
+                        int day = i;
+                        mBirthday = getActivity().getResources().getString(R.string.birthday_string, year, month, day);
+                        mBirthdayText.setText(mBirthday);
+                    }
+                }, year, month, day);
+                datePickerDialog.show();
+            }
+        });
     }
 
     private void updateUi() {
@@ -117,7 +146,7 @@ public class EditContactDetailsFragment extends Fragment {
             mFirstNameEdit.setText(mContact.getFirstName());
             mLastNameEdit.setText(mContact.getLastName());
             mPhoneNumberEdit.setText(String.valueOf(mContact.getPhoneNumber()));
-            //mBirthdayEdit.setText(mContact.getBirthday());
+            mBirthdayText.setText("Birthday: " + mContact.getBirthday());
             mAddressEdit.setText(mContact.getAddress());
             mZipCodeEdit.setText(String.valueOf(mContact.getZipCode()));
         }

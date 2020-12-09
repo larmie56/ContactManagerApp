@@ -66,27 +66,25 @@
 
     <TextView
         android:id="@+id/text_birthday"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/birthday"
         android:textSize="15sp"
         android:layout_marginTop="16dp"
         android:layout_marginStart="16dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/image_birthday"
         app:layout_constraintTop_toBottomOf="@id/text_input_phone_number" />
 
     <ImageView
         android:id="@+id/image_birthday"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
         android:src="@drawable/ic_calender"
-        android:padding="8dp"
-        app:layout_constraintBottom_toBottomOf="@id/text_birthday"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/text_birthday"
-        app:layout_constraintTop_toTopOf="@id/text_birthday"
+        android:layout_marginTop="4dp"
+        android:padding="4dp"
+        app:layout_constraintEnd_toEndOf="@id/text_birthday"
+        app:layout_constraintStart_toStartOf="@id/text_birthday"
+        app:layout_constraintTop_toBottomOf="@id/text_birthday"
         app:tint="@color/lime_dark"
         android:contentDescription="@string/birthday" />
 
@@ -100,7 +98,7 @@
         android:layout_marginEnd="16dp"
         app:errorEnabled="true"
         app:errorIconDrawable="@drawable/ic_error"
-        app:layout_constraintTop_toBottomOf="@id/text_birthday"
+        app:layout_constraintTop_toBottomOf="@id/image_birthday"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
         <com.google.android.material.textfield.TextInputEditText
