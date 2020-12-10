@@ -3,9 +3,11 @@ package com.tepcentre.contactmanagerapp.ui;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Looper;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,8 +36,10 @@ public class EditContactDetailsFragment extends Fragment {
 
     public static final long NEW_CONTACT_ID = -1L;
     private static final CharSequence ERROR_MESSAGE = "Field cannot be empty";
+    public static final String CONTACT = "Contact";
 
     private long mContactId;
+    private boolean doesNumberExist = false;
 
     private TextView mBirthdayText;
     private TextInputLayout mFirstNameTextInput;
@@ -84,6 +88,16 @@ public class EditContactDetailsFragment extends Fragment {
         mPhoneNumberTextInput = view.findViewById(R.id.text_input_phone_number);
         mAddressTextInput = view.findViewById(R.id.text_input_address);
         mZipCodeTextInput = view.findViewById(R.id.text_input_zip_code);
+
+        if (savedInstanceState != null) {
+            Contact contact = savedInstanceState.getParcelable(CONTACT);
+
+            mFirstNameEdit.setText(contact.getFirstName());
+            mLastNameEdit.setText(contact.getLastName());
+            mPhoneNumberEdit.setText(String.valueOf(contact.getPhoneNumber()));
+            mAddressEdit.setText(contact.getAddress());
+            mZipCodeEdit.setText(String.valueOf(contact.getZipCode()));
+        }
 
 
         watchEditTextChanges(mFirstNameEdit, mFirstNameTextInput);
@@ -142,7 +156,7 @@ public class EditContactDetailsFragment extends Fragment {
                 DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
-                        int  year = i2;
+                        int year = i2;
                         int month = i1 + 1;
                         int day = i;
                         mBirthday = getActivity().getResources().getString(R.string.birthday_string, year, month, day);
@@ -154,12 +168,30 @@ public class EditContactDetailsFragment extends Fragment {
         });
     }
 
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        getUserInput();
+        mContact = new Contact(mFirstName,
+                mLastName,
+                Long.parseLong(mPhoneNumber),
+                mBirthday,
+                mAddress,
+                Integer.parseInt(mZipCode)
+        );
+        outState.putParcelable(CONTACT, mContact);
+    }
+
     private void updateUi() {
         //Ensure a contact has been passed in
         if (mContact != null) {
             mFirstNameEdit.setText(mContact.getFirstName());
             mLastNameEdit.setText(mContact.getLastName());
             mPhoneNumberEdit.setText(String.valueOf(mContact.getPhoneNumber()));
+            if (mContact.getBirthday() == null) {
+                mBirthdayText.setText("Birthday not set");
+            }
             mBirthdayText.setText("Birthday: " + mContact.getBirthday());
             mAddressEdit.setText(mContact.getAddress());
             mZipCodeEdit.setText(String.valueOf(mContact.getZipCode()));
@@ -207,8 +239,16 @@ public class EditContactDetailsFragment extends Fragment {
                 mAddress,
                 Integer.parseInt(mZipCode)
         );
-        if (mContact != null) mContactViewModel.insertContact(mContact);
-        Toast.makeText(getContext(), "Contact Added Successfully", Toast.LENGTH_SHORT).show();
+        //Check if the phone number already exist in the database before adding the contact
+        //while (mContactViewModel.getHasSetContact().get()) {
+            if (mContactViewModel.getContactByNumber(mPhoneNumber) != null) {
+                Toast.makeText(getContext(), "Phone number already saved ~ " +
+                        mContactViewModel.getContactByNumber(mPhoneNumber).getFirstName(), Toast.LENGTH_SHORT).show();
+            } else {
+                mContactViewModel.insertContact(mContact);
+                Toast.makeText(getContext(), "Contact Added Successfully", Toast.LENGTH_SHORT).show();
+            }
+        //}
     }
 
     private void handleUpdateContact() {
@@ -218,7 +258,16 @@ public class EditContactDetailsFragment extends Fragment {
         mContact.setBirthday(mBirthday);
         mContact.setAddress(mAddress);
         mContact.setZipCode(Integer.parseInt(mZipCode));
-        if (mContact != null) mContactViewModel.updateContact(mContact);
-        Toast.makeText(getContext(), "Contact Updated Successfully", Toast.LENGTH_SHORT).show();
+        mContactViewModel.getContactByNumber(mPhoneNumber);
+        //Check if the phone number already exist in the database before updating the contact
+        //while (!mContactViewModel.getHasSetContact().get()) {
+            if (mContactViewModel.getContactByNumber(mPhoneNumber) != null) {
+                Toast.makeText(getContext(), "Phone number already saved ~ " +
+                        mContactViewModel.getContactByNumber(mPhoneNumber).getFirstName(), Toast.LENGTH_SHORT).show();
+            } else {
+                mContactViewModel.updateContact(mContact);
+                Toast.makeText(getContext(), "Contact Updated Successfully", Toast.LENGTH_SHORT).show();
+            }
+        //}
     }
 }

@@ -1,12 +1,15 @@
 package com.tepcentre.contactmanagerapp.database;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 @Entity(tableName = "contact_table", indices = {@Index(value = "phone_number", unique = true)})
-public class Contact {
+public class Contact implements Parcelable {
 
     public Contact() {}
 
@@ -38,6 +41,28 @@ public class Contact {
     private String address;
     @ColumnInfo(name = "zip_code")
     private int zipCode;
+
+    protected Contact(Parcel in) {
+        contactId = in.readLong();
+        firstName = in.readString();
+        lastName = in.readString();
+        phoneNumber = in.readLong();
+        birthday = in.readString();
+        address = in.readString();
+        zipCode = in.readInt();
+    }
+
+    public static final Creator<Contact> CREATOR = new Creator<Contact>() {
+        @Override
+        public Contact createFromParcel(Parcel in) {
+            return new Contact(in);
+        }
+
+        @Override
+        public Contact[] newArray(int size) {
+            return new Contact[size];
+        }
+    };
 
     public void setContactId(long contactId) {
         this.contactId = contactId;
@@ -93,5 +118,21 @@ public class Contact {
 
     public int getZipCode() {
         return zipCode;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeLong(contactId);
+        parcel.writeString(firstName);
+        parcel.writeString(lastName);
+        parcel.writeLong(phoneNumber);
+        parcel.writeString(birthday);
+        parcel.writeString(address);
+        parcel.writeInt(zipCode);
     }
 }
