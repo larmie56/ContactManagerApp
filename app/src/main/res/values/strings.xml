@@ -13,4 +13,5 @@
     <string name="delete">Delete</string>
     <string name="contact_deleted">The contact has been deleted</string>
     <string name="cancel">Cancel</string>
+    <string name="birthday_string">Birthday - %1$d/%2$d/%3$d</string>
 </resources>

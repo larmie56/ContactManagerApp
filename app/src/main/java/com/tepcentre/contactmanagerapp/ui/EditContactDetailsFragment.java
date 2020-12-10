@@ -1,11 +1,20 @@
 package com.tepcentre.contactmanagerapp.ui;
 
+import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Looper;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.DatePicker;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -17,13 +26,27 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import com.tepcentre.contactmanagerapp.R;
 import com.tepcentre.contactmanagerapp.database.Contact;
+
+import java.util.Calendar;
 
 public class EditContactDetailsFragment extends Fragment {
 
     public static final long NEW_CONTACT_ID = -1L;
+    private static final CharSequence ERROR_MESSAGE = "Field cannot be empty";
+    public static final String CONTACT = "Contact";
+
     private long mContactId;
+    private boolean doesNumberExist = false;
+
+    private TextView mBirthdayText;
+    private TextInputLayout mFirstNameTextInput;
+    private TextInputLayout mLastNameTextInput;
+    private TextInputLayout mPhoneNumberTextInput;
+    private TextInputLayout mAddressTextInput;
+    private TextInputLayout mZipCodeTextInput;
     private TextInputEditText mFirstNameEdit;
     private TextInputEditText mLastNameEdit;
     private TextInputEditText mPhoneNumberEdit;
@@ -40,6 +63,7 @@ public class EditContactDetailsFragment extends Fragment {
     private String mZipCode;
 
     private Contact mContact;
+    private ContactViewModel mContactViewModel;
 
     @Nullable
     @Override
@@ -54,20 +78,43 @@ public class EditContactDetailsFragment extends Fragment {
         mFirstNameEdit = view.findViewById(R.id.edit_first_name);
         mLastNameEdit = view.findViewById(R.id.edit_last_name);
         mPhoneNumberEdit = view.findViewById(R.id.edit_phone_number);
+        mBirthdayText = view.findViewById(R.id.text_birthday);
         mBirthdayImage = view.findViewById(R.id.image_birthday);
         mAddressEdit = view.findViewById(R.id.edit_address);
         mZipCodeEdit = view.findViewById(R.id.edit_zip_code);
         mSaveChangesButton = view.findViewById(R.id.button_save_changes);
+        mFirstNameTextInput = view.findViewById(R.id.text_input_first_name);
+        mLastNameTextInput = view.findViewById(R.id.text_input_last_name);
+        mPhoneNumberTextInput = view.findViewById(R.id.text_input_phone_number);
+        mAddressTextInput = view.findViewById(R.id.text_input_address);
+        mZipCodeTextInput = view.findViewById(R.id.text_input_zip_code);
+
+        if (savedInstanceState != null) {
+            Contact contact = savedInstanceState.getParcelable(CONTACT);
+
+            mFirstNameEdit.setText(contact.getFirstName());
+            mLastNameEdit.setText(contact.getLastName());
+            mPhoneNumberEdit.setText(String.valueOf(contact.getPhoneNumber()));
+            mAddressEdit.setText(contact.getAddress());
+            mZipCodeEdit.setText(String.valueOf(contact.getZipCode()));
+        }
+
+
+        watchEditTextChanges(mFirstNameEdit, mFirstNameTextInput);
+        watchEditTextChanges(mLastNameEdit, mLastNameTextInput);
+        watchEditTextChanges(mPhoneNumberEdit, mPhoneNumberTextInput);
+        watchEditTextChanges(mAddressEdit, mAddressTextInput);
+        watchEditTextChanges(mZipCodeEdit, mZipCodeTextInput);
 
         mContactId = EditContactDetailsFragmentArgs.fromBundle(requireArguments()).getContactId();
         boolean isNewContact = mContactId == NEW_CONTACT_ID;
 
-        ContactViewModel contactViewModel = new ViewModelProvider(getActivity()).get(ContactViewModel.class);
+        mContactViewModel = new ViewModelProvider(getActivity()).get(ContactViewModel.class);
 
         if (!isNewContact) {
             //Updating a contact ~ fetch the contact from the database and display to the user
-            contactViewModel.getContact(mContactId);
-            contactViewModel.getContactLiveData().observe(getViewLifecycleOwner(), new Observer<Contact>() {
+            mContactViewModel.getContact(mContactId);
+            mContactViewModel.getContactLiveData().observe(getViewLifecycleOwner(), new Observer<Contact>() {
                 @Override
                 public void onChanged(Contact contact) {
                     mContact = contact;
@@ -80,35 +127,60 @@ public class EditContactDetailsFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 getUserInput();
-                if (!(mFirstName.isEmpty() && mLastName.isEmpty() && mPhoneNumber.isEmpty() && mZipCode.isEmpty())) {
+                if (!mFirstName.isEmpty() && !mLastName.isEmpty() && !mPhoneNumber.isEmpty()
+                        && !(mBirthday != null && mBirthday.isEmpty()) && !mAddress.isEmpty() && !mZipCode.isEmpty()) {
                     if (isNewContact) {
-                        mContact = new Contact(mFirstName,
-                                mLastName,
-                                Long.parseLong(mPhoneNumber),
-                                mBirthday,
-                                mAddress,
-                                Integer.parseInt(mZipCode)
-                        );
-                        if (mContact != null) contactViewModel.insertContact(mContact);
-                        Toast.makeText(getContext(), "Contact Added Successfully", Toast.LENGTH_SHORT).show();
+                        handleCreateContact();
                     } else {
-                        mContact.setFirstName(mFirstName);
-                        mContact.setLastName(mLastName);
-                        mContact.setPhoneNumber(Long.parseLong(mPhoneNumber));
-                        mContact.setBirthday(mBirthday);
-                        mContact.setAddress(mAddress);
-                        mContact.setZipCode(Integer.parseInt(mZipCode));
-                        if (mContact != null) contactViewModel.updateContact(mContact);
-                        Toast.makeText(getContext(), "Contact Updated Successfully", Toast.LENGTH_SHORT).show();
+                        handleUpdateContact();
                     }
                     //Update/Insert completed, navigate back to the all contacts screen
                     NavController navController = Navigation.findNavController(view);
                     navController
                             .navigate(EditContactDetailsFragmentDirections
                                     .actionEditContactDetailsFragmentToAllContactsFragment());
+                } else {
+                    Toast.makeText(getContext(), "Please fill all the fields", Toast.LENGTH_SHORT).show();
                 }
             }
         });
+
+        mBirthdayImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Calendar calendar = Calendar.getInstance();
+                final Integer year = calendar.get(Calendar.YEAR);
+                int month = calendar.get(Calendar.MONTH);
+                int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+                DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
+                        int year = i2;
+                        int month = i1 + 1;
+                        int day = i;
+                        mBirthday = getActivity().getResources().getString(R.string.birthday_string, year, month, day);
+                        mBirthdayText.setText(mBirthday);
+                    }
+                }, year, month, day);
+                datePickerDialog.show();
+            }
+        });
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        getUserInput();
+        mContact = new Contact(mFirstName,
+                mLastName,
+                Long.parseLong(mPhoneNumber),
+                mBirthday,
+                mAddress,
+                Integer.parseInt(mZipCode)
+        );
+        outState.putParcelable(CONTACT, mContact);
     }
 
     private void updateUi() {
@@ -117,10 +189,38 @@ public class EditContactDetailsFragment extends Fragment {
             mFirstNameEdit.setText(mContact.getFirstName());
             mLastNameEdit.setText(mContact.getLastName());
             mPhoneNumberEdit.setText(String.valueOf(mContact.getPhoneNumber()));
-            //mBirthdayEdit.setText(mContact.getBirthday());
+            if (mContact.getBirthday() == null) {
+                mBirthdayText.setText("Birthday not set");
+            }
+            mBirthdayText.setText("Birthday: " + mContact.getBirthday());
             mAddressEdit.setText(mContact.getAddress());
             mZipCodeEdit.setText(String.valueOf(mContact.getZipCode()));
         }
+    }
+
+    private void watchEditTextChanges(TextInputEditText editText, TextInputLayout textInputLayout) {
+        editText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                //Check if the user has filled an edit text field, if they haven't, show show an indication
+                if (s.toString().isEmpty()) {
+                    textInputLayout.setError(ERROR_MESSAGE);
+                } else {
+                    textInputLayout.setError(null);
+                }
+            }
+
+        });
     }
 
     private void getUserInput() {
@@ -129,5 +229,45 @@ public class EditContactDetailsFragment extends Fragment {
         mPhoneNumber = mPhoneNumberEdit.getText().toString();
         mAddress = mAddressEdit.getText().toString();
         mZipCode = mZipCodeEdit.getText().toString();
+    }
+
+    private void handleCreateContact() {
+        mContact = new Contact(mFirstName,
+                mLastName,
+                Long.parseLong(mPhoneNumber),
+                mBirthday,
+                mAddress,
+                Integer.parseInt(mZipCode)
+        );
+        //Check if the phone number already exist in the database before adding the contact
+        //while (mContactViewModel.getHasSetContact().get()) {
+            if (mContactViewModel.getContactByNumber(mPhoneNumber) != null) {
+                Toast.makeText(getContext(), "Phone number already saved ~ " +
+                        mContactViewModel.getContactByNumber(mPhoneNumber).getFirstName(), Toast.LENGTH_SHORT).show();
+            } else {
+                mContactViewModel.insertContact(mContact);
+                Toast.makeText(getContext(), "Contact Added Successfully", Toast.LENGTH_SHORT).show();
+            }
+        //}
+    }
+
+    private void handleUpdateContact() {
+        mContact.setFirstName(mFirstName);
+        mContact.setLastName(mLastName);
+        mContact.setPhoneNumber(Long.parseLong(mPhoneNumber));
+        mContact.setBirthday(mBirthday);
+        mContact.setAddress(mAddress);
+        mContact.setZipCode(Integer.parseInt(mZipCode));
+        mContactViewModel.getContactByNumber(mPhoneNumber);
+        //Check if the phone number already exist in the database before updating the contact
+        //while (!mContactViewModel.getHasSetContact().get()) {
+            if (mContactViewModel.getContactByNumber(mPhoneNumber) != null) {
+                Toast.makeText(getContext(), "Phone number already saved ~ " +
+                        mContactViewModel.getContactByNumber(mPhoneNumber).getFirstName(), Toast.LENGTH_SHORT).show();
+            } else {
+                mContactViewModel.updateContact(mContact);
+                Toast.makeText(getContext(), "Contact Updated Successfully", Toast.LENGTH_SHORT).show();
+            }
+        //}
     }
 }
