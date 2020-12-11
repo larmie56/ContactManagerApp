@@ -11,7 +11,6 @@ import com.tepcentre.contactmanagerapp.database.ContactDatabase;
 import java.util.List;
 
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
-import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class ContactRepoImpl implements ContactRepo{
@@ -67,7 +66,7 @@ public class ContactRepoImpl implements ContactRepo{
 
     @Override
     public void cleanup() {
-        if (!(mDisposable == null && mDisposable.isDisposed())) {
+        if (mDisposable != null && !mDisposable.isDisposed()) {
             mDisposable.dispose();
         }
     }

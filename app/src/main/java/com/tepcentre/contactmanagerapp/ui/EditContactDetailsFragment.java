@@ -39,7 +39,6 @@ public class EditContactDetailsFragment extends Fragment {
     public static final String CONTACT = "Contact";
 
     private long mContactId;
-    private boolean doesNumberExist = false;
 
     private TextView mBirthdayText;
     private TextInputLayout mFirstNameTextInput;
@@ -191,8 +190,9 @@ public class EditContactDetailsFragment extends Fragment {
             mPhoneNumberEdit.setText(String.valueOf(mContact.getPhoneNumber()));
             if (mContact.getBirthday() == null) {
                 mBirthdayText.setText("Birthday not set");
+            } else {
+                mBirthdayText.setText("Birthday: " + mContact.getBirthday());
             }
-            mBirthdayText.setText("Birthday: " + mContact.getBirthday());
             mAddressEdit.setText(mContact.getAddress());
             mZipCodeEdit.setText(String.valueOf(mContact.getZipCode()));
         }
@@ -239,16 +239,9 @@ public class EditContactDetailsFragment extends Fragment {
                 mAddress,
                 Integer.parseInt(mZipCode)
         );
-        //Check if the phone number already exist in the database before adding the contact
-        //while (mContactViewModel.getHasSetContact().get()) {
-            if (mContactViewModel.getContactByNumber(mPhoneNumber) != null) {
-                Toast.makeText(getContext(), "Phone number already saved ~ " +
-                        mContactViewModel.getContactByNumber(mPhoneNumber).getFirstName(), Toast.LENGTH_SHORT).show();
-            } else {
-                mContactViewModel.insertContact(mContact);
-                Toast.makeText(getContext(), "Contact Added Successfully", Toast.LENGTH_SHORT).show();
-            }
-        //}
+
+        mContactViewModel.insertContact(mContact);
+        Toast.makeText(getContext(), "Contact Added Successfully", Toast.LENGTH_SHORT).show();
     }
 
     private void handleUpdateContact() {
@@ -258,16 +251,8 @@ public class EditContactDetailsFragment extends Fragment {
         mContact.setBirthday(mBirthday);
         mContact.setAddress(mAddress);
         mContact.setZipCode(Integer.parseInt(mZipCode));
-        mContactViewModel.getContactByNumber(mPhoneNumber);
-        //Check if the phone number already exist in the database before updating the contact
-        //while (!mContactViewModel.getHasSetContact().get()) {
-            if (mContactViewModel.getContactByNumber(mPhoneNumber) != null) {
-                Toast.makeText(getContext(), "Phone number already saved ~ " +
-                        mContactViewModel.getContactByNumber(mPhoneNumber).getFirstName(), Toast.LENGTH_SHORT).show();
-            } else {
-                mContactViewModel.updateContact(mContact);
-                Toast.makeText(getContext(), "Contact Updated Successfully", Toast.LENGTH_SHORT).show();
-            }
-        //}
+
+        mContactViewModel.updateContact(mContact);
+        Toast.makeText(getContext(), "Contact Updated Successfully", Toast.LENGTH_SHORT).show();
     }
 }
