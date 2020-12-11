@@ -27,7 +27,7 @@ public class Util {
 
     //Get the first character of the first name and last name
     public String getTextDrawableCharacters() {
-        if (!(mContact.getFirstName().isEmpty() && mContact.getLastName().isEmpty())) {
+        if (!mContact.getFirstName().isEmpty() && !mContact.getLastName().isEmpty()) {
             return String.valueOf(mContact.getFirstName().charAt(0)).toUpperCase()
                     + String.valueOf(mContact.getLastName().charAt(0)).toUpperCase();
         }
