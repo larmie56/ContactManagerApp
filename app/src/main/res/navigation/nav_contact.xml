@@ -6,7 +6,7 @@
     <fragment
         android:id="@+id/allContactsFragment"
         android:name="com.tepcentre.contactmanagerapp.ui.AllContactsFragment"
-        android:label="AllContactsFragment" >
+        android:label="All Contacts" >
         <action
             android:id="@+id/action_allContactsFragment_to_viewContactDetailsFragment"
             app:destination="@id/viewContactDetailsFragment" />
@@ -17,7 +17,7 @@
     <fragment
         android:id="@+id/viewContactDetailsFragment"
         android:name="com.tepcentre.contactmanagerapp.ui.ViewContactDetailsFragment"
-        android:label="ViewContactDetailsFragment" >
+        android:label="Contact Details" >
         <action
             android:id="@+id/action_viewContactDetailsFragment_to_editContactDetailsFragment"
             app:destination="@id/editContactDetailsFragment" />
@@ -33,7 +33,7 @@
     <fragment
         android:id="@+id/editContactDetailsFragment"
         android:name="com.tepcentre.contactmanagerapp.ui.EditContactDetailsFragment"
-        android:label="EditContactDetailsFragment" >
+        android:label="Edit Contact Details" >
         <action
             android:id="@+id/action_editContactDetailsFragment_to_allContactsFragment"
             app:destination="@id/allContactsFragment"

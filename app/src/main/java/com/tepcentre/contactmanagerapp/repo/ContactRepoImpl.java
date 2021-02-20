@@ -10,13 +10,15 @@ import com.tepcentre.contactmanagerapp.database.ContactDatabase;
 
 import java.util.List;
 
-import io.reactivex.rxjava3.disposables.CompositeDisposable;
-import io.reactivex.rxjava3.schedulers.Schedulers;
+import io.reactivex.Single;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
 
 public class ContactRepoImpl implements ContactRepo{
 
     private final ContactDao mContactDao;
     private final CompositeDisposable mDisposable = new CompositeDisposable();
+    private volatile boolean mHasInserted;
 
     public ContactRepoImpl(Application application) {
         ContactDatabase contactDatabase = ContactDatabase.getDatabase(application);
@@ -31,7 +33,6 @@ public class ContactRepoImpl implements ContactRepo{
                 mContactDao.insertContact(contact);
             }
         }));
-
     }
 
     @Override
@@ -62,6 +63,19 @@ public class ContactRepoImpl implements ContactRepo{
     @Override
     public LiveData<Contact> getContact(long contactId) {
         return mContactDao.getContact(contactId);
+    }
+
+    @Override
+    public Single<Boolean> existOrInsertContact(long numberToGet, Contact contactToInsert) {
+        synchronized (this) {
+            mDisposable.add(Schedulers.io().scheduleDirect(new Runnable() {
+                @Override
+                public void run() {
+                    mHasInserted = mContactDao.existOrInsertContact(numberToGet, contactToInsert);
+                }
+            }));
+            return Single.just(mHasInserted);
+        }
     }
 
     @Override

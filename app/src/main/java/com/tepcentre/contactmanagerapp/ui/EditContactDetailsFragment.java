@@ -1,11 +1,8 @@
 package com.tepcentre.contactmanagerapp.ui;
 
 import android.app.DatePickerDialog;
-import android.content.Intent;
 import android.os.Bundle;
-import android.os.Looper;
 import android.text.Editable;
-import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.DatePicker;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -53,6 +51,7 @@ public class EditContactDetailsFragment extends Fragment {
     private TextInputEditText mAddressEdit;
     private TextInputEditText mZipCodeEdit;
     private FrameLayout mSaveChangesButton;
+    private ProgressBar mProgressBar;
 
     private String mFirstName;
     private String mLastName;
@@ -63,6 +62,7 @@ public class EditContactDetailsFragment extends Fragment {
 
     private Contact mContact;
     private ContactViewModel mContactViewModel;
+    private boolean mIsNewContact;
 
     @Nullable
     @Override
@@ -87,17 +87,7 @@ public class EditContactDetailsFragment extends Fragment {
         mPhoneNumberTextInput = view.findViewById(R.id.text_input_phone_number);
         mAddressTextInput = view.findViewById(R.id.text_input_address);
         mZipCodeTextInput = view.findViewById(R.id.text_input_zip_code);
-
-        if (savedInstanceState != null) {
-            Contact contact = savedInstanceState.getParcelable(CONTACT);
-
-            mFirstNameEdit.setText(contact.getFirstName());
-            mLastNameEdit.setText(contact.getLastName());
-            mPhoneNumberEdit.setText(String.valueOf(contact.getPhoneNumber()));
-            mAddressEdit.setText(contact.getAddress());
-            mZipCodeEdit.setText(String.valueOf(contact.getZipCode()));
-        }
-
+        mProgressBar = view.findViewById(R.id.progress_circular);
 
         watchEditTextChanges(mFirstNameEdit, mFirstNameTextInput);
         watchEditTextChanges(mLastNameEdit, mLastNameTextInput);
@@ -106,11 +96,11 @@ public class EditContactDetailsFragment extends Fragment {
         watchEditTextChanges(mZipCodeEdit, mZipCodeTextInput);
 
         mContactId = EditContactDetailsFragmentArgs.fromBundle(requireArguments()).getContactId();
-        boolean isNewContact = mContactId == NEW_CONTACT_ID;
+        mIsNewContact = mContactId == NEW_CONTACT_ID;
 
         mContactViewModel = new ViewModelProvider(getActivity()).get(ContactViewModel.class);
 
-        if (!isNewContact) {
+        if (!mIsNewContact) {
             //Updating a contact ~ fetch the contact from the database and display to the user
             mContactViewModel.getContact(mContactId);
             mContactViewModel.getContactLiveData().observe(getViewLifecycleOwner(), new Observer<Contact>() {
@@ -128,16 +118,16 @@ public class EditContactDetailsFragment extends Fragment {
                 getUserInput();
                 if (!mFirstName.isEmpty() && !mLastName.isEmpty() && !mPhoneNumber.isEmpty()
                         && !(mBirthday != null && mBirthday.isEmpty()) && !mAddress.isEmpty() && !mZipCode.isEmpty()) {
-                    if (isNewContact) {
-                        handleCreateContact();
-                    } else {
-                        handleUpdateContact();
-                    }
-                    //Update/Insert completed, navigate back to the all contacts screen
-                    NavController navController = Navigation.findNavController(view);
-                    navController
-                            .navigate(EditContactDetailsFragmentDirections
-                                    .actionEditContactDetailsFragmentToAllContactsFragment());
+                    Log.d("Unique constraint error", "Calling get contact by number ~ fragment");
+                    mContact = new Contact(mFirstName,
+                            mLastName,
+                            Long.parseLong(mPhoneNumber),
+                            mBirthday,
+                            mAddress,
+                            Integer.parseInt(mZipCode)
+                    );
+                    mContactViewModel.existOrInsertContact(Long.parseLong(mPhoneNumber), mContact);
+                    handleSaveContact(view);
                 } else {
                     Toast.makeText(getContext(), "Please fill all the fields", Toast.LENGTH_SHORT).show();
                 }
@@ -148,7 +138,7 @@ public class EditContactDetailsFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 Calendar calendar = Calendar.getInstance();
-                final Integer year = calendar.get(Calendar.YEAR);
+                final int year = calendar.get(Calendar.YEAR);
                 int month = calendar.get(Calendar.MONTH);
                 int day = calendar.get(Calendar.DAY_OF_MONTH);
 
@@ -167,19 +157,38 @@ public class EditContactDetailsFragment extends Fragment {
         });
     }
 
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
+    //Verify that the contact does not already exist in the database, before proceeding with the insert/update
+    private void handleSaveContact(View view) {
+        mContactViewModel.getDisplayProgressBarLive().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean shouldDisplayProgressBar) {
+                if (shouldDisplayProgressBar) {
+                    Log.d("Unique constraint error", "hasGottenContact onChanged() called ~ " + shouldDisplayProgressBar);
+                    mProgressBar.setVisibility(View.VISIBLE);
+                } else {
+                    mProgressBar.setVisibility(View.GONE);
+                    Log.d("Unique constraint error", "hasGottenContact onChanged() called ~ " + shouldDisplayProgressBar);
 
-        getUserInput();
-        mContact = new Contact(mFirstName,
-                mLastName,
-                Long.parseLong(mPhoneNumber),
-                mBirthday,
-                mAddress,
-                Integer.parseInt(mZipCode)
-        );
-        outState.putParcelable(CONTACT, mContact);
+                    if (mContactViewModel.getHasInsertedContact()) {
+                        Log.d("Unique constraint error", "has inserted contact ~ number is null");
+                        Toast.makeText(getContext(), "Contact Added Successfully", Toast.LENGTH_SHORT).show();
+                        /*if (mIsNewContact) {
+                            handleCreateContact();
+                        } else {
+                            handleUpdateContact();
+                        }*/
+                        //Update/Insert completed, navigate back to the all contacts screen
+                        NavController navController = Navigation.findNavController(view);
+                        navController
+                                .navigate(EditContactDetailsFragmentDirections
+                                        .actionEditContactDetailsFragmentToAllContactsFragment());
+                    } else {
+                        Log.d("Unique constraint error", "has gotten contact ~ number is not null");
+                        Toast.makeText(getContext(), "This contact already exist", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        });
     }
 
     private void updateUi() {
